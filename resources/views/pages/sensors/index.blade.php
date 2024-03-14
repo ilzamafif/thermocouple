@@ -5,10 +5,16 @@
  <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1.0">
  <title>Document</title>
+ <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 </head>
 
-<body style="background: #5C5C5C; color: white; font-family: sans-serif;">
- <canvas id="myChart"></canvas>
+<body style="background: #1b1e23; color: white; font-family: sans-serif;">
+ <div class="row justify-content-center my-3 ">
+  <div class="col-md-10">
+   <canvas id="myChart"></canvas>
+  </div>
+ </div>
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
  <script>
   var ctx = document.getElementById("myChart").getContext('2d');
@@ -39,17 +45,23 @@
     },
     scales: {
      yAxes: [{
+      gridLines: {
+       color: "#49514C"
+      },
       ticks: {
        fontColor: "white",
-       fontSize: 11,
+       fontSize: 16,
        stepSize: 10,
-       beginAtZero: true
+       beginAtZero: true,
       }
      }],
      xAxes: [{
+      gridLines: {
+       color: "#49514C"
+      },
       ticks: {
-       fontColor: "#fff",
-       fontSize: 14,
+       fontColor: "#aeaeae",
+       fontSize: 18,
        stepSize: 1,
        beginAtZero: true
       }

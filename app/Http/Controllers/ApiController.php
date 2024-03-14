@@ -19,10 +19,9 @@ class ApiController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'time' => '',
                 'humidity' => 'required',
             ]);
-
+            
             if ($validator->fails()) {
                 return response()->json(["status" => "error", "message" => $validator->errors()], 400);
             }
