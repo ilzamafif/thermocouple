@@ -1,20 +1,14 @@
 <?php
 
 namespace App\Http\Controllers;
-
-use Illuminate\Console\Command;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
+// ApiController.php
 use Pusher\Pusher;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\Controller;
 
 class ApiController extends Controller
 {
-    public function index()
-    {
-        return "Halaman Utama";
-    }
-
     public function espSensor(Request $request)
     {
         try {
@@ -28,11 +22,6 @@ class ApiController extends Controller
 
             $humidity = $request->input('humidity');
 
-            // Simpan data ke database
-            $sensorData = [
-                'humidity' => $humidity,
-            ];
-
             // Panggil Pusher untuk mengirim informasi sensor
             $pusher = new Pusher(
                 env('PUSHER_APP_KEY'),
@@ -44,9 +33,9 @@ class ApiController extends Controller
                 ]
             );
 
-            $pusher->trigger('sensor-channel', 'sensor-event', ['data' => $sensorData]);
+            $pusher->trigger('sensor-channel', 'sensor-event', ['data' => $humidity]);
 
-            return response()->json(["status" => "success", "message" => "data berhasil disimpan"], 200);
+            return response()->json(["status" => "success", "message" => "Data berhasil disimpan"], 200);
         } catch (\Exception $e) {
             return response()->json(["status" => "error", "message" => $e->getMessage()], 500);
         }
