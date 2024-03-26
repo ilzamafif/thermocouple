@@ -25,6 +25,7 @@ class SensorController extends Controller
     {
         $sensor = new Sensor;
         $sensor->temperature = $request->temperature;
+        $sensor->alarm = $request->alarm;
         $sensor->save();
 
 

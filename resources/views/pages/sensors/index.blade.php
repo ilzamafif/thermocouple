@@ -89,7 +89,7 @@
       myChart.data.datasets[0].data.push(data.data);
       // play mp3 where data > 90 in javascript
 
-      if (data.data > 32.5) {
+      if (data.alarm == 1) {
         var audio = new Audio("{{ asset('audio/alaram.mp3') }}");
         audio.play();
       }

@@ -14,6 +14,7 @@ class ApiController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'temperature' => 'required',
+                'alarm' => '',
             ]);
             
             if ($validator->fails()) {
@@ -21,6 +22,7 @@ class ApiController extends Controller
             }
 
             $temperature = $request->input('temperature');
+            $alarm = $request->input('alarm');
 
             // Panggil Pusher untuk mengirim informasi sensor
             $pusher = new Pusher(
@@ -33,7 +35,7 @@ class ApiController extends Controller
                 ]
             );
 
-            $pusher->trigger('sensor-channel', 'sensor-event', ['data' => $temperature]);
+            $pusher->trigger('sensor-channel', 'sensor-event', ['data' => $temperature, 'alarm' => $alarm]);
 
             return response()->json(["status" => "success", "message" => "Data berhasil disimpan"], 200);
         } catch (\Exception $e) {
