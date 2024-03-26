@@ -24,7 +24,7 @@ class SensorController extends Controller
     public function store(Request $request)
     {
         $sensor = new Sensor;
-        $sensor->humidity = $request->humidity;
+        $sensor->temperature = $request->temperature;
         $sensor->save();
 
 

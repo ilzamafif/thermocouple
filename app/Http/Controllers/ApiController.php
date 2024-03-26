@@ -13,14 +13,14 @@ class ApiController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'humidity' => 'required',
+                'temperature' => 'required',
             ]);
             
             if ($validator->fails()) {
                 return response()->json(["status" => "error", "message" => $validator->errors()], 400);
             }
 
-            $humidity = $request->input('humidity');
+            $temperature = $request->input('temperature');
 
             // Panggil Pusher untuk mengirim informasi sensor
             $pusher = new Pusher(
@@ -33,7 +33,7 @@ class ApiController extends Controller
                 ]
             );
 
-            $pusher->trigger('sensor-channel', 'sensor-event', ['data' => $humidity]);
+            $pusher->trigger('sensor-channel', 'sensor-event', ['data' => $temperature]);
 
             return response()->json(["status" => "success", "message" => "Data berhasil disimpan"], 200);
         } catch (\Exception $e) {
