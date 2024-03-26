@@ -11,7 +11,8 @@
 
 <body style="background: #1b1e23; color: white; font-family: sans-serif;">
   <div class="row justify-content-center my-3 ">
-    <div class="col-md-10">
+    <div class="col-md-9 mt-3">
+      <h1 class="ms-4 ">TEMP : <span id="data" style=" color: #00ffff;">0</span> °C</h1>
       <canvas id="myChart"></canvas>
     </div>
   </div>
@@ -30,7 +31,7 @@
           length: 8
         }, (_, i) => ''),
         datasets: [{
-          label: 'Thermocouple',
+          label: '',
           data: initialData,
           fill: false,
           borderColor: '#00ffff',
@@ -86,6 +87,13 @@
       console.log(data)
       myChart.data.labels.push(new Date().toLocaleTimeString());
       myChart.data.datasets[0].data.push(data.data);
+      // play mp3 where data > 90 in javascript
+
+      if (data.data > 32.5) {
+        var audio = new Audio("{{ asset('audio/alaram.mp3') }}");
+        audio.play();
+      }
+      document.getElementById("data").innerHTML = data.data;
 
       if (myChart.data.labels.length > 8) {
         myChart.data.labels.shift();
@@ -95,6 +103,7 @@
       myChart.update();
     });
   </script>
+
 </body>
 
 </html>
