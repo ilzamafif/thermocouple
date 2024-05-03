@@ -7,6 +7,8 @@
     <title>Thermocouple</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://js.pusher.com/8.0/pusher.min.js"></script>
+    <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin">
+    <meta http-equiv="Cross-Origin-Embedder-Policy" content="require-corp">
     <style>
       @media only screen and (min-width: 1201px) {
 
@@ -131,6 +133,7 @@
 
     <div class="row justify-content-center">
       <div class="col-md-9 baris-3">
+        <button class="btn btn-primary my-1 ms-2" id="authorize_button" onclick="handleAuthClick()" value="Authorize">Simpan ke Google Drive</button>
         <table class="table table-striped table-hover table-light ms-2">
           <thead>
             <tr class="text-center">
@@ -142,6 +145,7 @@
           </tbody>
         </table>
       </div>
+       
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
@@ -211,6 +215,7 @@
       });
 
       const channel = pusher.subscribe('sensor-channel');
+      let fileContent = '';
       channel.bind('sensor-event', function(data) {
 
         const options = {
@@ -221,6 +226,7 @@
         };
         myChart.data.labels.push(new Date().toLocaleTimeString("pt-BR", options));
         myChart.data.datasets[0].data.push(data.data);
+        fileContent += `${new Date().toLocaleTimeString("pt-BR")} - Suhu: ${data.data} °C\n`;
 
         if (data.alarm == 1) {
           var audio = new Audio("{{ asset('audio/alarm.mp3') }}");
@@ -249,6 +255,139 @@
         myChart.update();
       });
     </script>
+    <script>
+      // TODO: Set the below credentials
+      const CLIENT_ID = '812976116770-7q6pr2ebj481dk1t5necb64d510n7ot3.apps.googleusercontent.com';
+      const API_KEY = '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';
+
+      // Discovery URL for APIs used by the quickstart
+      const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
+
+      // Set API access scope before proceeding authorization request
+      const SCOPES = 'https://www.googleapis.com/auth/drive.file';
+      let tokenClient;
+      let gapiInited = false;
+      let gisInited = false;
+
+      // document.getElementById('authorize_button').style.visibility = 'hidden';
+      // document.getElementById('signout_button').style.visibility = 'hidden';
+
+      /**
+       * Callback after api.js is loaded.
+       */
+      function gapiLoaded() {
+        gapi.load('client', initializeGapiClient);
+      }
+
+      /**
+       * Callback after the API client is loaded. Loads the
+       * discovery doc to initialize the API.
+       */
+      async function initializeGapiClient() {
+        await gapi.client.init({
+          apiKey: API_KEY,
+          discoveryDocs: [DISCOVERY_DOC],
+        });
+        gapiInited = true;
+        maybeEnableButtons();
+      }
+
+      /**
+       * Callback after Google Identity Services are loaded.
+       */
+      function gisLoaded() {
+        tokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: CLIENT_ID,
+          scope: SCOPES,
+          callback: '', // defined later
+        });
+        gisInited = true;
+        maybeEnableButtons();
+      }
+
+      /**
+       * Enables user interaction after all libraries are loaded.
+       */
+      function maybeEnableButtons() {
+        if (gapiInited && gisInited) {
+          document.getElementById('authorize_button').style.visibility = 'visible';
+        }
+      }
+
+      /**
+       *  Sign in the user upon button click.
+       */
+      function handleAuthClick() {
+        tokenClient.callback = async (resp) => {
+          if (resp.error !== undefined) {
+            throw (resp);
+          }
+          // document.getElementById('signout_button').style.visibility = 'visible';
+          // document.getElementById('authorize_button').value = 'Refresh';
+          await uploadFile();
+
+        };
+
+        if (gapi.client.getToken() === null) {
+          // Prompt the user to select a Google Account and ask for consent to share their data
+          // when establishing a new session.
+          tokenClient.requestAccessToken({ prompt: 'consent' });
+        } else {
+          // Skip display of account chooser and consent dialog for an existing session.
+          tokenClient.requestAccessToken({ prompt: '' });
+        }
+      }
+
+      /**
+       *  Sign out the user upon button click.
+       */
+      function handleSignoutClick() {
+        const token = gapi.client.getToken();
+        if (token !== null) {
+          google.accounts.oauth2.revoke(token.access_token);
+          // gapi.client.setToken('');
+          document.getElementById('content').style.display = 'none';
+          // document.getElementById('content').innerHTML = '';
+          document.getElementById('authorize_button').value = 'Authorize';
+          // document.getElementById('signout_button').style.visibility = 'hidden';
+        }
+      }
+
+      /**
+       * Upload file to Google Drive.
+       */
+      async function uploadFile() {
+        var file = new Blob([fileContent], { type: 'text/plain' });
+        var metadata = {
+          'name': 'data', // Filename at Google Drive
+          'mimeType': 'text/plain', // mimeType at Google Drive
+          // TODO [Optional]: Set the below credentials
+          // Note: remove this parameter, if no target is needed
+          'parents': ['1qvt4mLipR3UGUhOmjLvuFh-3EE74BOPY'], // Folder ID at Google Drive which is optional
+        };
+
+        var accessToken = gapi.auth.getToken().access_token; // Here gapi is used for retrieving the access token.
+        var form = new FormData();
+        form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+        form.append('file', file);
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('post', 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id');
+        xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+        xhr.responseType = 'json';
+        xhr.onload = () => {
+          console.log(xhr.response.id)
+          // document.getElementById('content').innerHTML = "File uploaded successfully. The Google Drive file id is <b>" + xhr.response.id + "</b>";
+          // document.getElementById('content').style.display = 'block';
+        };
+        xhr.send(form);
+      }
+    </script>
+    
+    <script async defer src="https://apis.google.com/js/api.js"
+    onload="gapiLoaded()"></script>
+<script async defer src="https://accounts.google.com/gsi/client"
+    onload="gisLoaded()"></script>
   </body>
 
   </html>
