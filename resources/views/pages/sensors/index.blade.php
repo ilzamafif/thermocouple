@@ -136,7 +136,10 @@
           <div class="col-md-9 baris-3">
               <button class="btn btn-primary my-1 ms-2" id="authorize_button" onclick="handleAuthClick()"
                   value="Authorize">Simpan ke Google Drive</button>
-              <table class="table table-striped table-hover table-light ms-2">
+                  <!--<a href="https://stackoverflow.com/questions/57000915/error-adb-exited-with-exit-code-1-performing-streamed-install">drive</a>-->
+                  <!--<a href="https://iot.wyasaaplikasi.com/">drive</a>-->
+
+                  <table class="table table-striped table-hover table-light ms-2">
                   <thead>
                       <tr class="text-center">
                           <th scope="col">Waktu</th>
