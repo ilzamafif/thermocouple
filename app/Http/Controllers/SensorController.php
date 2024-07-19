@@ -20,7 +20,7 @@ class SensorController extends Controller
             'data' => $data
         ]);
     }
-
+    
     public function store(Request $request)
     {
         $sensor = new Sensor;
@@ -30,5 +30,10 @@ class SensorController extends Controller
 
 
         return redirect()->back();
+    }
+
+    public function show() {
+        
+        return view('pages.sensors.res');
     }
 }

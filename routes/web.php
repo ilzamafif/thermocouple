@@ -15,7 +15,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', [SensorController::class, 'index'])->name('sensors');
+Route::get('/', [SensorController::class, 'index']);
+Route::get('/redirect', [SensorController::class, 'show']);
 Route::get('/sensors', [SensorController::class, 'index'])->name('sensors');
 Route::post('/sensors', [SensorController::class, 'store'])->name('sensors.store');
 
