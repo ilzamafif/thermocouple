@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [ApiController::class, 'index']);
 Route::post('/esp_sensor', [ApiController::class, 'espSensor']);
+Route::get('/temperature', [ApiController::class, 'index']);
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });

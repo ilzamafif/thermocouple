@@ -19,6 +19,10 @@ Route::get('/', [SensorController::class, 'index']);
 Route::get('/redirect', [SensorController::class, 'show']);
 Route::get('/sensors', [SensorController::class, 'index'])->name('sensors');
 Route::post('/sensors', [SensorController::class, 'store'])->name('sensors.store');
+// routes/web.php
+Route::post('/store-data', [SensorController::class, 'storeData']);
+Route::get('/get-data',[SensorController::class, 'getData']);
+
 
 Route::get('/clear-cache', function () {
    Artisan::call('cache:clear');

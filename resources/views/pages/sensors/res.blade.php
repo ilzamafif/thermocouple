@@ -1,22 +1,26 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <title>Google Drive Upload</title>
-    <script src="https://apis.google.com/js/api.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirect Page</title>
+</head>
+<body>
     <script>
         document.addEventListener('DOMContentLoaded', async function() {
             const urlParams = new URLSearchParams(window.location.hash.substring(1));
             const accessToken = urlParams.get('access_token');
+
             if (accessToken) {
-                const fileContent = localStorage.getItem('fileContent'); // Retrieve fileContent from localStorage
-                if (fileContent) {
-                    await uploadFile(accessToken, fileContent);
-                    localStorage.removeItem('fileContent'); // Optionally clear the stored fileContent
-                } else {
-                    await uploadFile(accessToken, '-');
-                    console.error('No file content found');
+                const response = await fetch('/get-data');
+                if (!response.ok) {
+                    console.error('Failed to retrieve data');
+                    return;
                 }
+                const data = await response.json();
+                const fileContent = data['fileContent']['fileContent'];
+
+                await uploadFile(accessToken, fileContent);
             } else {
                 console.error('Access token not found in URL');
             }
@@ -44,7 +48,7 @@
             xhr.onload = () => {
                 if (xhr.status === 200) {
                     console.log('File uploaded successfully. File ID:', xhr.response.id);
-                    window.location.href = "{{ url('/') }}"; // Redirect to the main page after successful upload
+                    window.location.href = "myapp://redirect";
                 } else {
                     console.error('Error uploading file:', xhr.response);
                 }
@@ -52,10 +56,5 @@
             xhr.send(form);
         }
     </script>
-</head>
-
-<body>
-    <p>Uploading to Google Drive...</p>
 </body>
-
 </html>

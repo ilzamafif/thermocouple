@@ -9,6 +9,8 @@
       <script src="https://js.pusher.com/8.0/pusher.min.js"></script>
       <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin">
       <meta http-equiv="Cross-Origin-Embedder-Policy" content="require-corp">
+      <meta name="csrf-token" content="{{ csrf_token() }}">
+
       <style>
           @media only screen and (min-width: 1201px) {
 
@@ -304,15 +306,35 @@
           }
 
           function handleAuthClick() {
-              // Save fileContent to localStorage
-              localStorage.setItem('fileContent', fileContent);
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-              const redirectUri = `${window.location.origin}/redirect`; // Replace with your actual redirect URI
-              const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=token&client_id=${CLIENT_ID}&scope=${SCOPES}&redirect_uri=${redirectUri}`;
-
-              // Open the URL in a new tab
-              window.open(authUrl, '_blank');
-          }
+    fetch('/store-data', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken // Tambahkan token CSRF di sini
+        },
+        body: JSON.stringify({
+            fileContent
+        }),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json(); // Mengembalikan data JSON jika berhasil
+    })
+    .then(data => {
+        console.log('Data stored successfully:', data); // Menampilkan data sukses
+        const redirectUri = `${window.location.origin}/redirect`; // Replace with your actual redirect URI
+        const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=token&client_id=${CLIENT_ID}&scope=${SCOPES}&redirect_uri=${redirectUri}`;
+        // Open the URL in a new tab
+        window.open(authUrl, '_blank');
+    })
+    .catch(error => {
+        console.error('Error storing data:', error); // Menangani kesalahan
+    });
+}
       </script>
       <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
       <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>

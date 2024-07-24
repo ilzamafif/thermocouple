@@ -6,6 +6,7 @@ use Pusher\Pusher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
+use App\Models\Sensor;
 
 class ApiController extends Controller
 {
@@ -41,5 +42,15 @@ class ApiController extends Controller
         } catch (\Exception $e) {
             return response()->json(["status" => "error", "message" => $e->getMessage()], 500);
         }
+    }
+    
+    public function index()
+    {
+        // get 4 data form database latest
+        $data = Sensor::orderBy('id', 'desc')->limit(4)->get();
+        return response()->json([
+            'data' => $data,
+            'timestamp' => now(),
+        ]);
     }
 }
