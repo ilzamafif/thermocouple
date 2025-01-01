@@ -136,6 +136,8 @@
           <div class="col-md-9 baris-3">
               <button class="btn btn-primary my-1 ms-2" id="authorize_button" onclick="handleAuthClick()"
                   value="Authorize">Simpan ke Google Drive</button>
+                    <button class="btn btn-danger my-1 ms-2" id="alarm_button" style="display: none;" onclick="handleAlarmClick()">Alarm Triggered</button>
+
                   <!--<a href="https://stackoverflow.com/questions/57000915/error-adb-exited-with-exit-code-1-performing-streamed-install">drive</a>-->
                   <!--<a href="https://iot.wyasaaplikasi.com/">drive</a>-->
 
@@ -233,12 +235,17 @@
               };
               myChart.data.labels.push(new Date().toLocaleTimeString("pt-BR", options));
               myChart.data.datasets[0].data.push(data.data);
-              fileContent += `${new Date().toLocaleTimeString("pt-BR")} - Suhu: ${data.data} °C\n`;
+              fileContent += `${new Date().toLocaleTimeString("pt-BR")} - Suhu: ${data.data} 째C\n`;
 
               if (data.alarm == 1) {
                   var audio = new Audio("{{ asset('audio/alarm.mp3') }}");
                   audio.play();
+                  if (window.Flutter) {
+                    window.Flutter.postMessage('triggerAlarm');
+                  }
               }
+              
+              // Kirim pesan ke Flutter
               document.getElementById("data").innerHTML = data.data;
 
               // Create a new row in the table
@@ -247,7 +254,7 @@
               var cell2 = newRow.insertCell(0);
               var cell3 = newRow.insertCell(1);
               cell2.textContent = new Date().toLocaleTimeString("pt-BR", options);
-              cell3.textContent = data.data + " °C"; // Temperature
+              cell3.textContent = data.data + " 째C"; // Temperature
 
               // Remove the first row if there are more than 5 rows
               if (tableBody.rows.length > 5) {
